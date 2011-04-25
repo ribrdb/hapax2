@@ -212,9 +212,10 @@ public final class CTemplateParser
         throws TemplateParserException
     {
         int lno = input.lineNumber();
+        String indentation = input.getIndentation();
         String consumed = parseClose(input);
         String token = consumed.substring(3,consumed.length()-2).trim();
-        return (new IncludeNode(lno,token));
+        return (new IncludeNode(lno,token,indentation));
     }
     private static TemplateNode parseVariable(ParserReader input)
         throws TemplateParserException

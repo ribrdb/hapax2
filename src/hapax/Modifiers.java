@@ -44,9 +44,14 @@ public final class Modifiers {
         J, // JavaScript string literal
         U, // URL escaped (%xx)
         B, // turns \n into <br/>
+        INDENT
     }
 
     public static String applyModifiers(String input, List<FLAGS> modifiers) {
+        return applyModifiersWithIndentation(input, modifiers, "\n");
+    }
+    
+    public static String applyModifiersWithIndentation(String input, List<FLAGS> modifiers, String indentation) {
         for (FLAGS modifier : modifiers) {
             switch (modifier) {
             case H:
@@ -63,18 +68,31 @@ public final class Modifiers {
                 break;
             case B:
                 input = newlinesToBreaks(input);
+            case INDENT:
+                input = indent(input, indentation);
             }
         }
         return input;
     }
 
     public static List<FLAGS> parseModifiers(String[] split) {
+        return parseModifiersWithIndentation(split, null);
+    }
+
+    public static List<FLAGS> parseModifiersWithIndentation(String[] split, String indentation) {
         List<FLAGS> list =
             new ArrayList<FLAGS>(10);
         for (int i = 1; i < split.length; i++) {
             list.add(FLAGS.valueOf(split[i].toUpperCase()));
         }
+        if (indentation != null && !indentation.equals("\n")) {
+            list.add(FLAGS.INDENT);
+        }
         return list;
+    }
+
+    public static String indent(String input, String indentation) {
+        return input.replace("\n", indentation);
     }
 
     /**
@@ -169,7 +187,6 @@ public final class Modifiers {
         }
         return escaped.toString();
     }
-
 
     private Modifiers() {
         super();

@@ -39,6 +39,8 @@ public final class ParserReader
 
     private int lno = 1;
 
+    private String indentation = "\n";
+
     private int advance;
 
 
@@ -137,9 +139,10 @@ public final class ParserReader
         if (null != buf){
             int buflen = buf.length;
             if ((-1 < start && start < buflen)&&(start <= end && end <= buflen)){
-                if (start == end)
+                if (start == end) {
+                    this.indentation = null;
                     return "";
-                else {
+                } else {
                     int relen = (end-start);
                     char[] re = new char[relen];
                     System.arraycopy(buf,start,re,0,relen);
@@ -174,6 +177,7 @@ public final class ParserReader
                             this.buffer = nb;
                         }
                     }
+                    this.indentation = getIndentation(re,relen,"\n".equals(this.indentation));
                     return this.lines(re,0,relen);
                 }
             }
@@ -218,6 +222,9 @@ public final class ParserReader
         else
             return "";
     }
+    public String getIndentation(){
+        return this.indentation;
+    }
 
     protected String lines(char[] re, int ofs, int len){
 
@@ -237,5 +244,28 @@ public final class ParserReader
                 num += 1;
         }
         return num;
+    }
+    protected static String getIndentation(char[] buf, int len, boolean firstLine) {
+        int newline;
+        for (newline = len - 1; newline >= 0 && buf[newline] != '\n'; --newline) {
+            switch (buf[newline]) {
+                case ' ': case '\t': break;
+                default: return null;
+            }
+        }
+        if (newline == -1) {
+            if (firstLine) {
+                StringBuilder sb = new StringBuilder(len + 1);
+                sb.append('\n');
+                sb.append(buf, 0, len);
+                return sb.toString();
+            } else {
+                return null;
+            }
+        }
+        if (newline == len - 1) {
+            return null;
+        }
+        return new String(buf, newline, len - newline);
     }
 }

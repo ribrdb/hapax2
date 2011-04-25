@@ -50,15 +50,17 @@ public final class IncludeNode
 {
 
     private final String name;
+    private final String indentation;
 
     final List<Modifiers.FLAGS> modifiers;
 
 
-    IncludeNode(int lno, String spec) {
+    IncludeNode(int lno, String spec, String indentation) {
         super(lno);
         String split[] = spec.split(":");
         this.name = split[0];
-        this.modifiers = Modifiers.parseModifiers(split);
+        this.indentation = indentation;
+        this.modifiers = Modifiers.parseModifiersWithIndentation(split, indentation);
     }
 
 
@@ -117,7 +119,7 @@ public final class IncludeNode
                 if (previous_printwriter != null) {
                     String results = sw.toString();
                     out = previous_printwriter;
-                    out.write(Modifiers.applyModifiers(results, this.modifiers));
+                    out.write(Modifiers.applyModifiersWithIndentation(results, this.modifiers, this.indentation));
                 }
             }
         }
