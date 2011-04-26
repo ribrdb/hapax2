@@ -107,7 +107,7 @@ public class TemplateResourceLoader implements TemplateLoader {
 			throw new TemplateException(e);
 		}
 
-		Template template = parser == null ? new Template(contents, context) : new Template(parser, contents, context);
+		Template template = parser == null ? new Template(contents, context, resource) : new Template(parser, contents, context, resource);
 
 		synchronized (cache) {
 			cache.put(templatePath, template);

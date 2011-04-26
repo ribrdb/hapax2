@@ -98,7 +98,15 @@ public final class IncludeNode
                     /*
                      * Once
                      */
+                    if (dict.debugAnnotationsEnabled()) {
+                        out.write("{{#INC=");
+                        out.write(this.name);
+                        out.write("}}");
+                    }
                     template.render(dict, out);
+                    if (dict.debugAnnotationsEnabled()) {
+                        out.write("{{/INC}}");
+                    }
                 }
                 else {
                     /*
@@ -110,7 +118,15 @@ public final class IncludeNode
 
                         Iterator.Define(child,sectionName,cc,count);
 
+                        if (dict.debugAnnotationsEnabled()) {
+                            out.write("{{#INC=");
+                            out.write(this.name);
+                            out.write("}}");
+                        }
                         template.render(child, out);
+                        if (dict.debugAnnotationsEnabled()) {
+                            out.write("{{/INC}}");
+                        }
                     }
                 }
 
@@ -121,7 +137,11 @@ public final class IncludeNode
                     out = previous_printwriter;
                     out.write(Modifiers.applyModifiersWithIndentation(results, this.modifiers, this.indentation));
                 }
+            } else if (dict.debugAnnotationsEnabled()) {
+                out.write("{{#INC="+this.name+"}}{{MISSING_FILE=" + filename + "}}{{/INC}}");
             }
+        } else if (dict.debugAnnotationsEnabled()) {
+            out.write("{{#INC="+this.name+"}}{{/INC}}");
         }
     }
 

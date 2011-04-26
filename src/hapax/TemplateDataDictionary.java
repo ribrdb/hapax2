@@ -76,5 +76,9 @@ public interface TemplateDataDictionary
      * @return New section.
      */
     public TemplateDataDictionary addSection(String sectionName);
+    
+    public void enableDebugAnnotations();
+    
+    public boolean debugAnnotationsEnabled();
 
 }

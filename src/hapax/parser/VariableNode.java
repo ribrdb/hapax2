@@ -70,13 +70,21 @@ public final class VariableNode
                          PrintWriter out)
     {
         String t = dict.getVariable(variable);
-        if (null == t)
-            return;
-        else if (this.modifiers.isEmpty())
-            out.write(t);
-        else {
-            t = Modifiers.applyModifiers(t, this.modifiers);
-            out.write(t);
+        if (dict.debugAnnotationsEnabled()) {
+            out.write("{{#VAR=");
+            out.write(variable);
+            out.write("}}");
+        }
+        if (null != t) {
+            if (this.modifiers.isEmpty())
+                out.write(t);
+            else {
+                t = Modifiers.applyModifiers(t, this.modifiers);
+                out.write(t);
+            }
+        }
+        if (dict.debugAnnotationsEnabled()) {
+            out.write("{{/VAR}}");
         }
     }
 

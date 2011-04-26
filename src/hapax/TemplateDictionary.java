@@ -63,6 +63,8 @@ public class TemplateDictionary
     protected LinkedHashMap<String, List<TemplateDataDictionary>> sections = new LinkedHashMap<String, List<TemplateDataDictionary>>();
 
     protected TemplateDataDictionary parent;
+    
+    protected boolean annotations;
 
 
     public TemplateDictionary() {
@@ -71,6 +73,7 @@ public class TemplateDictionary
     protected TemplateDictionary(TemplateDataDictionary parent) {
         super();
         this.parent = parent;
+        this.annotations = parent.debugAnnotationsEnabled();
     }
 
 
@@ -296,5 +299,12 @@ public class TemplateDictionary
         }
 
         return sectionClone;
+    }
+
+    public void enableDebugAnnotations() { annotations = true; }
+    public boolean debugAnnotationsEnabled() { return annotations; }
+
+    public String toString() {
+        return "{" + variables + ", " + sections + "}";
     }
 }

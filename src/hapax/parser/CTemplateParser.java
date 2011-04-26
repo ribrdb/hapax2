@@ -56,7 +56,7 @@ public final class CTemplateParser
     public final static String Eval(TemplateLoader context, TemplateDataDictionary dict, String sourcecode)
         throws TemplateException
     {
-        Template template = new Template(Instance,sourcecode,context);
+        Template template = new Template(Instance,sourcecode,context, "<source>");
         return template.renderToString(dict);
     }
 

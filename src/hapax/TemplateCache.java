@@ -155,9 +155,9 @@ public class TemplateCache
         TemplateParser parser = this.parser;
 
         if (null == parser)
-            return (new Template(contents, context));
+            return (new Template(contents, context, url.toString()));
         else
-            return (new Template(parser, contents, context));
+            return (new Template(parser, contents, context, url.toString()));
     }
 
     protected Template read(File file, long fileLast)
@@ -190,9 +190,9 @@ public class TemplateCache
 
         TemplateParser parser = this.parser;
         if (null == parser)
-            template = new Template(fileLast, contents, context);
+            template = new Template(fileLast, contents, context, file.getPath());
         else
-            template = new Template(fileLast, parser, contents, context);
+            template = new Template(fileLast, parser, contents, context, file.getPath());
 
         synchronized(this.cache){
             this.cache.put(file.getPath(),template);

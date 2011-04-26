@@ -55,7 +55,7 @@ public final class Template
     public final static String Eval(TemplateLoader context, TemplateDataDictionary dict, String source)
         throws TemplateException
     {
-        Template template = new Template(CTemplateParser.Instance,source,context);
+        Template template = new Template(CTemplateParser.Instance,source,context,"<string>");
         return template.renderToString(dict);
     }
 
@@ -63,33 +63,35 @@ public final class Template
     private final long lastModified;
     private final List<TemplateNode> template;
     private final TemplateLoader context;
+    private final String resource;
 
 
-    public Template(String template, TemplateLoader context)
+    public Template(String template, TemplateLoader context, String resource)
         throws TemplateException
     {
-        this(0L,template,context);
+        this(0L,template,context,resource);
     }
-    public Template(long lastModified, String template, TemplateLoader context)
+    public Template(long lastModified, String template, TemplateLoader context, String resource)
         throws TemplateException
     {
-        this(lastModified, CTemplateParser.Instance, template, context);
+        this(lastModified, CTemplateParser.Instance, template, context, resource);
     }
-    public Template(TemplateParser parser, String template, TemplateLoader context)
+    public Template(TemplateParser parser, String template, TemplateLoader context, String resource)
         throws TemplateException
     {
-        this(0L, parser, template, context);
+        this(0L, parser, template, context, resource);
     }
-    public Template(long lastModified, TemplateParser parser, String template, TemplateLoader context)
+    public Template(long lastModified, TemplateParser parser, String template, TemplateLoader context, String resource)
         throws TemplateException
     {
-        this(lastModified, parser.parse(context,template), context);
+        this(lastModified, parser.parse(context,template), context, resource);
     }
-    private Template(long lastModified, List<TemplateNode> tmpl, TemplateLoader context) {
+    private Template(long lastModified, List<TemplateNode> tmpl, TemplateLoader context, String resource) {
         super();
         this.lastModified = lastModified;
         this.template = tmpl;
         this.context = context;
+        this.resource = resource;
     }
 
 
@@ -128,6 +130,11 @@ public final class Template
     private void render(int offset, List<TemplateNode> template, TemplateDataDictionary dict, PrintWriter writer)
         throws TemplateException
     {
+        if (Top == offset && template == this.template && dict.debugAnnotationsEnabled()) {
+            writer.write("{{#FILE=");
+            writer.write(resource);
+            writer.write("}}");
+        }
         for (int position = 0, count = template.size(); position < count; position++) {
 
             TemplateNode node = template.get(position);
@@ -143,6 +150,9 @@ public final class Template
                 node.evaluate(dict, this.context, writer);
                 break;
             }
+        }
+        if (Top == offset && template == this.template && dict.debugAnnotationsEnabled()) {
+            writer.write("{{/FILE}}");
         }
     }
     private int renderSectionNode(int offset, List<TemplateNode> template, TemplateDataDictionary dict, int open,
@@ -166,7 +176,15 @@ public final class Template
                     /*
                      * Once
                      */
+                    if (dict.debugAnnotationsEnabled()) {
+                        writer.write("{{#SEC=");
+                        writer.write(sectionName);
+                        writer.write("}}");
+                    }
                     this.render(next, template.subList(next, close), dict, writer);
+                    if (dict.debugAnnotationsEnabled()) {
+                        writer.write("{{/SEC}}");
+                    }
                 }
                 else {
                     /*
@@ -174,13 +192,25 @@ public final class Template
                      */
                     for (int cc = 0, count = data.size(); cc < count; cc++){
 
+                        if (dict.debugAnnotationsEnabled()) {
+                            writer.write("{{#SEC=");
+                            writer.write(sectionName);
+                            writer.write("}}");
+                        }
                         TemplateDataDictionary child = data.get(cc);
 
                         Iterator.Define(child,sectionName,cc,count);
 
                         this.render(next, template.subList(next, close), child, writer);
+                        if (dict.debugAnnotationsEnabled()) {
+                            writer.write("{{/SEC}}");
+                        }
                     }
                 }
+            } else if (dict.debugAnnotationsEnabled()) {
+                writer.write("{{#SEC=");
+                writer.write(section.getSectionName());
+                writer.write("}}{{/SEC}}");
             }
             return close;
         }
